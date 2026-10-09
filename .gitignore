@@ -1,0 +1,40 @@
+# Code-only release: ignore everything unless explicitly allowed below.
+*
+
+# Approved source directories.
+!/configs/
+!/scripts/
+!/src/
+!/src/resunet_gan/
+!/src/resunet_gan/models/
+
+# Approved documentation and dependencies.
+!/.gitignore
+!/README.md
+!/requirements.txt
+!/LICENSE
+!/CITATION.cff
+
+# The sole public configuration.
+!/configs/reconstruction_gan.yaml
+
+# Approved command-line scripts.
+!/scripts/_bootstrap.py
+!/scripts/train.py
+!/scripts/inference.py
+!/scripts/make_splits.py
+
+# Approved implementation files.
+!/src/resunet_gan/__init__.py
+!/src/resunet_gan/config.py
+!/src/resunet_gan/data.py
+!/src/resunet_gan/engine.py
+!/src/resunet_gan/factory.py
+!/src/resunet_gan/hotspots.py
+!/src/resunet_gan/io.py
+!/src/resunet_gan/losses.py
+!/src/resunet_gan/spatial_masks.py
+!/src/resunet_gan/utils.py
+!/src/resunet_gan/models/__init__.py
+!/src/resunet_gan/models/discriminator.py
+!/src/resunet_gan/models/generator.py

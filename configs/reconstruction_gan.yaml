@@ -1,0 +1,190 @@
+# Standalone public training defaults; no inherited or private experiment configuration.
+# Paths are relative to the working directory. GAN is enabled from epoch 1.
+# These defaults are not a record of the configuration used for published results.
+project:
+  name: image_reconstruction_gan
+  seed: 42
+  output_dir: outputs
+data:
+  lesion_root: data/cases
+  expected_shape:
+  - 21
+  - 128
+  - 128
+  input_keys:
+  - t1_pre
+  - t2
+  - dwi
+  - sub1
+  target_keys:
+  - sub2
+  - sub3
+  - sub4
+  - sub5
+  roi_source: t1_post3
+  roi_sources:
+    sub2: t1_post2
+    sub3: t1_post3
+    sub4: t1_post4
+    sub5: t1_post5
+  context_roi:
+    enabled: true
+    radius_mm: 4.0
+  num_workers: 4
+  pin_memory: true
+split:
+  path: outputs/patient_split.json
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+  overwrite: false
+  stratify:
+    enabled: false
+normalization:
+  cache_enabled: true
+  cache_path: null
+  workers: 4
+  foreground_percentile: 1.0
+  min_scale: 1.0e-06
+  input_clip_z: 6.0
+  sub_clip_z: null
+  target_scale: t1_pre
+augmentation:
+  enable: true
+  flip_prob: 0.5
+model:
+  generator:
+    in_channels: 4
+    out_channels: 4
+    base_channels: 32
+    channel_multipliers:
+    - 1
+    - 2
+    - 4
+    - 8
+    attention: true
+    checkpoint: false
+    norm: group
+    norm_groups: 8
+    phase_conditioning:
+      enabled: true
+      embedding_dim: 64
+    residual_anchor_key: sub1
+  discriminator:
+    in_channels: 8
+    base_channels: 16
+    channel_multipliers:
+    - 1
+    - 2
+    - 4
+    - 8
+    multiscale: false
+    num_scales: 1
+hotspot:
+  enabled: false
+loss:
+  charbonnier: 1.0
+  roi_charbonnier: 1.0
+  perilesional_near_charbonnier: 0.5
+  ssim: 0.0
+  roi_ssim: 0.1
+  gradient: 0.0
+  roi_gradient_boundary: 0.1
+  texture: 0.05
+  roi_texture: 0.1
+  perilesional_near_texture: 0.1
+  background_positive_leak: 0.1
+  perilesional_positive_leak: 0.1
+  roi_pe_curve: 0.1
+  temporal: 0.1
+  temporal_anchor_key: sub1
+  gan: 0.05
+  local_gan: 0.0
+  feature_matching: 0.0
+  local_feature_matching: 0.0
+  gan_mode: lsgan
+  gan_start_epoch: 1
+  gan_ramp_epochs: 0
+  charbonnier_eps: 0.001
+  ssim_window:
+  - 3
+  - 7
+  - 7
+  ssim_data_range: 12.0
+  ssim_clip: 6.0
+  texture_mode: laplacian_3d
+  texture_pyramid_kernels:
+  - - 3
+    - 3
+    - 3
+  - - 3
+    - 5
+    - 5
+  - - 5
+    - 7
+    - 7
+  texture_pyramid_weights:
+  - 1.0
+  - 1.0
+  - 1.0
+  texture_phase_weights:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  background_near_zero_threshold: 0.25
+  background_positive_tolerance: 0.05
+  perilesional_kernel:
+  - 3
+  - 7
+  - 7
+  perilesional_target_threshold: 0.25
+  perilesional_tolerance: 0.05
+  pe_precontrast_floor: 0.25
+train:
+  epochs: 220
+  batch_size: 8
+  gradient_accumulation: 1
+  lr_g: 2.5e-05
+  lr_d: 2.5e-05
+  d_update_interval: 1
+  betas:
+  - 0.5
+  - 0.999
+  weight_decay_g: 1.0e-05
+  weight_decay_d: 0.0
+  grad_clip_g: 1.0
+  grad_clip_d: 1.0
+  amp: true
+  device: cuda
+  log_every: 10
+  save_every: 10
+  max_train_batches: null
+  max_val_batches: null
+  resume: null
+  init_checkpoint: null
+  metric_for_best: val_loss
+  lower_is_better: true
+  local_adversarial:
+    enabled: false
+  scheduler_g:
+    type: none
+  scheduler_d:
+    type: none
+  early_stopping:
+    enabled: false
+validation:
+  batch_size: 1
+inference:
+  checkpoint: outputs/checkpoints/best.pt
+logging:
+  tensorboard: true
+  console_metrics:
+  - epoch
+  - train_g_loss
+  - train_d_loss
+  - train_gan_loss
+  - val_loss
+  - val_mae
+  - gan_weight
+  - lr_g
